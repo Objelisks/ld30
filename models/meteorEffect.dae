@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<COLLADA xmlns="http://www.collada.org/2005/11/COLLADASchema" version="1.4.1">
+  <asset>
+    <contributor>
+      <author>Blender User</author>
+      <authoring_tool>Blender 2.71.0 commit date:2014-06-25, commit time:18:36, hash:9337574</authoring_tool>
+    </contributor>
+    <created>2014-08-22T22:40:16</created>
+    <modified>2014-08-22T22:40:16</modified>
+    <unit name="meter" meter="1"/>
+    <up_axis>Z_UP</up_axis>
+  </asset>
+  <library_images/>
+  <library_effects>
+    <effect id="Material-effect">
+      <profile_COMMON>
+        <technique sid="common">
+          <lambert>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <color sid="diffuse">0.8000001 0.1933867 0.04273785 1</color>
+            </diffuse>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </lambert>
+        </technique>
+      </profile_COMMON>
+    </effect>
+  </library_effects>
+  <library_materials>
+    <material id="Material-material" name="Material">
+      <instance_effect url="#Material-effect"/>
+    </material>
+  </library_materials>
+  <library_geometries>
+    <geometry id="meteorEffect-mesh" name="meteorEffect">
+      <mesh>
+        <source id="meteorEffect-mesh-positions">
+          <float_array id="meteorEffect-mesh-positions-array" count="108">1.40497e-7 -4.91738e-7 -100 72.36074 -52.57253 -44.72195 -27.6388 -85.06493 -44.72198 -89.44262 -4.91738e-7 -44.72156 -27.6388 85.06493 -44.72198 72.36074 52.57253 -44.72195 -16.24556 -49.99953 -85.06545 42.53227 -30.90114 -85.06542 26.28688 -80.90116 -52.57376 85.06479 -4.91738e-7 -52.57359 42.53227 30.90114 -85.06542 -52.57298 -4.91738e-7 -85.06517 -68.81894 -49.99969 -52.57362 -16.24556 49.99953 -85.06545 -68.81894 49.99969 -52.57362 26.28688 80.90116 -52.57376 95.10578 -30.90126 -1.40497e-7 95.10578 30.90126 -1.40497e-7 1.40497e-7 -100 -1.40497e-7 58.77856 -80.90167 -1.40497e-7 -95.10578 -30.90126 -1.40497e-7 -58.77856 -80.90167 -1.40497e-7 -58.77856 80.90167 -1.40497e-7 -95.10578 30.90126 -1.40497e-7 58.77856 80.90167 -1.40497e-7 1.40497e-7 100 -1.40497e-7 -65.80395 119.1937 267.8914 34.29257 86.67031 267.8914 -227.7637 1.522472 267.8914 -165.9005 86.67031 267.8914 -165.9005 -188.8715 267.8914 -227.7637 -103.7237 267.8914 34.29257 -188.8715 267.8914 -65.80395 -221.3949 267.8914 96.15576 1.522472 267.8914 96.15576 -103.7237 267.8914</float_array>
+          <technique_common>
+            <accessor source="#meteorEffect-mesh-positions-array" count="36" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <source id="meteorEffect-mesh-normals">
+          <float_array id="meteorEffect-mesh-normals-array" count="180">0.1023809 -0.3150898 -0.9435235 0.700224 -0.2680318 -0.6616988 -0.2680342 -0.1947364 -0.9435229 -0.2680342 0.1947364 -0.9435229 0.1023809 0.3150898 -0.9435235 0.9049891 -0.2680315 -0.3303845 0.02474665 -0.9435214 -0.3303861 -0.8896974 -0.3150945 -0.3303847 -0.5746018 0.7487835 -0.3303875 0.534576 0.7778646 -0.3303866 0.8026092 -0.5831264 -0.1256272 -0.3065689 -0.9435215 -0.1256286 -0.9920774 0 -0.1256283 -0.3065689 0.9435215 -0.1256286 0.8026092 0.5831264 -0.1256272 -0.03853029 -0.748779 -0.6616988 0.1875942 -0.5773454 -0.7946576 0.4712997 -0.5831224 -0.6616986 0.700224 0.2680318 -0.6616988 0.6070605 0 -0.7946556 0.3313045 0 -0.9435239 -0.7240422 -0.1947361 -0.6616953 -0.4911195 -0.3568211 -0.7946575 -0.4089462 -0.6284252 -0.6616985 -0.4089462 0.6284252 -0.6616985 -0.4911195 0.3568211 -0.7946575 -0.7240422 0.1947361 -0.6616953 0.4712997 0.5831223 -0.6616985 0.1875943 0.5773454 -0.7946576 -0.03853029 0.7487791 -0.6616988 0.9822459 0 -0.1875984 0.9049891 0.2680315 -0.3303845 0.3035308 -0.9341714 -0.1875974 0.534576 -0.7778646 -0.3303866 -0.7946556 -0.5773478 -0.187595 -0.5746019 -0.7487835 -0.3303875 -0.7946556 0.5773478 -0.187595 -0.8896974 0.3150946 -0.3303847 0.3035308 0.9341714 -0.1875974 0.02474665 0.9435214 -0.3303861 0.9999923 0 -0.003919363 -0.7057529 -0.5127567 -0.4888694 0.3090078 0.9510279 0.007765173 -0.2756309 -0.8483045 -0.452114 -0.3058602 0.9413406 -0.1425749 0.2912055 -0.896238 -0.3345992 -0.7668496 0.5571458 -0.318638 0.7984869 -0.5801314 -0.16083 -0.8961437 0 -0.443764 0.8075033 0.5866822 0.06117463 0.9999924 0 -0.003919363 -0.705753 -0.5127566 -0.4888694 0.3090078 0.9510278 0.007765173 -0.275631 -0.8483045 -0.452114 -0.3058602 0.9413406 -0.1425749 0.2912056 -0.8962382 -0.3345993 -0.7668497 0.5571457 -0.318638 0.7984868 -0.5801314 -0.16083 -0.8961437 0 -0.443764 0.8075034 0.5866823 0.06117463</float_array>
+          <technique_common>
+            <accessor source="#meteorEffect-mesh-normals-array" count="60" stride="3">
+              <param name="X" type="float"/>
+              <param name="Y" type="float"/>
+              <param name="Z" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
+        <vertices id="meteorEffect-mesh-vertices">
+          <input semantic="POSITION" source="#meteorEffect-mesh-positions"/>
+        </vertices>
+        <polylist material="Material-material" count="60">
+          <input semantic="VERTEX" source="#meteorEffect-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#meteorEffect-mesh-normals" offset="1"/>
+          <vcount>3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 3 </vcount>
+          <p>0 0 7 0 6 0 1 1 7 1 9 1 0 2 6 2 11 2 0 3 11 3 13 3 0 4 13 4 10 4 1 5 9 5 16 5 2 6 8 6 18 6 3 7 12 7 20 7 4 8 14 8 22 8 5 9 15 9 24 9 1 10 16 10 19 10 2 11 18 11 21 11 3 12 20 12 23 12 4 13 22 13 25 13 5 14 24 14 17 14 6 15 8 15 2 15 6 16 7 16 8 16 7 17 1 17 8 17 9 18 10 18 5 18 9 19 7 19 10 19 7 20 0 20 10 20 11 21 12 21 3 21 11 22 6 22 12 22 6 23 2 23 12 23 13 24 14 24 4 24 13 25 11 25 14 25 11 26 3 26 14 26 10 27 15 27 5 27 10 28 13 28 15 28 13 29 4 29 15 29 16 30 9 30 17 30 9 31 5 31 17 31 18 32 8 32 19 32 8 33 1 33 19 33 20 34 12 34 21 34 12 35 2 35 21 35 22 36 14 36 23 36 14 37 3 37 23 37 24 38 15 38 25 38 15 39 4 39 25 39 16 40 17 40 34 40 21 41 30 41 31 41 25 42 26 42 27 42 21 43 18 43 33 43 22 44 29 44 26 44 18 45 19 45 32 45 23 46 28 46 29 46 19 47 16 47 35 47 20 48 31 48 28 48 17 49 24 49 27 49 35 50 16 50 34 50 20 51 21 51 31 51 24 52 25 52 27 52 30 53 21 53 33 53 25 54 22 54 26 54 33 55 18 55 32 55 22 56 23 56 29 56 32 57 19 57 35 57 23 58 20 58 28 58 34 59 17 59 27 59</p>
+        </polylist>
+      </mesh>
+    </geometry>
+  </library_geometries>
+  <library_controllers/>
+  <library_visual_scenes>
+    <visual_scene id="Scene" name="Scene">
+      <node id="meteorEffect" name="meteorEffect" type="NODE">
+        <matrix sid="transform">1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1</matrix>
+        <instance_geometry url="#meteorEffect-mesh">
+          <bind_material>
+            <technique_common>
+              <instance_material symbol="Material-material" target="#Material-material"/>
+            </technique_common>
+          </bind_material>
+        </instance_geometry>
+      </node>
+    </visual_scene>
+  </library_visual_scenes>
+  <scene>
+    <instance_visual_scene url="#Scene"/>
+  </scene>
+</COLLADA>
