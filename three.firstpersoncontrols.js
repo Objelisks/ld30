@@ -18,7 +18,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
   this.autoForward = false;
   // this.invertVertical = false;
 
-  this.activeLook = true;
+  this.activeLook = false;
 
   this.heightSpeed = false;
   this.heightCoef = 1.0;
@@ -195,7 +195,7 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
   };
 
-  this.update = function( delta ) {
+  this.update = function( delta , dragCallback) {
 
     if ( this.freeze ) {
 
@@ -229,11 +229,12 @@ THREE.FirstPersonControls = function ( object, domElement ) {
 
     var actualLookSpeed = delta * this.lookSpeed;
 
-    if ( !this.activeLook ) {
+    //if ( !this.activeLook ) {
 
-      actualLookSpeed = 0;
+  //    actualLookSpeed = 0;
 
-    }
+//    }
+
 
     var verticalLookRatio = 1;
 
@@ -269,7 +270,6 @@ THREE.FirstPersonControls = function ( object, domElement ) {
     var drag = 0.9;
     this.mouseX *= drag;
     this.mouseY *= drag;
-
   };
 
 

@@ -1,12 +1,8 @@
 define(function(require, exports) {
 
-  var getVertexShader = function(name) {
-    return document.getElementById(name + '-vertexShader').textContent;
-  }
-
-  var getFragmentShader = function(name) {
-    return document.getElementById(name + '-fragmentShader').textContent;
-  }
+  var display = require('display');
+  var models = require('models');
+  var controls = require('controls');
 
   // basic three setup
   var renderer = new THREE.WebGLRenderer();
@@ -16,17 +12,14 @@ define(function(require, exports) {
   var clock = new THREE.Clock(true);
 
   var scene = new THREE.Scene();
-  var camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 5000);
+  var camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 5000);
   camera.position.y = 1.0;
   var controller = new THREE.FirstPersonControls(camera, renderer.domElement);
 
+  var pointer = new THREE.Mesh(new THREE.SphereGeometry(0.01), new THREE.MeshBasicMaterial());
+  var helperPointer = new THREE.Mesh(new THREE.SphereGeometry(0.1), new THREE.MeshBasicMaterial({ color: 0xff0000 }));
 
-  var update, render, start, init;
-
-  start = function() {
-    init();
-    render();
-  }
+  var update, render, init;
 
   render = function() {
     requestAnimationFrame(render);
@@ -36,43 +29,15 @@ define(function(require, exports) {
   }
 
 
-  // load model
-  var colladaLoader = new THREE.ColladaLoader();
-  colladaLoader.options.convertUpAxis = true;
-  colladaLoader.options.upAxis = 'Y';
 
-  var loadModel = function(name, callback) {
-    //var modelFile = require('./models/' + name + '.dae');
-    colladaLoader.load('./models/' + name + '.dae', function(collada) {
-      console.log('loaded mesh:', name);
-      callback(collada.scene);
-    });
-  }
-
-  var models = {};
-  var loadModels = function(callback) {
-    // hacky straight up defining all the model names
-    var modelNames = ['base', 'top', 'telescope', 'controlBox', 'meteor', 'meteorEffect', 'powerBox'];
-    var totalRequired = modelNames.length;
-    var totalLoaded = 0;
-    modelNames.forEach(function(name) {
-      loadModel(name, function(modelScene) {
-        //             scene      object      mesh
-        models[name] = modelScene.children[0].children[0];
-        totalLoaded += 1;
-        if(totalLoaded >= totalRequired) {
-          console.log('all loaded');
-          callback();
-        }
-      });
-    });
-  }
-
-
-  var displayUniforms = { 'time': { type: 'f', value: 0.5 } };
+  var timeUniform = { type: 'f', value: 0.5 };
   var top, telescope, meteor;
+  var displays = [];
+  var telescopeControls, planetTracker, mainScreen, laserSampler, teleportControls;
+  var hitObjects = [];
 
   init = function() {
+    // mood lighting
     var light = new THREE.HemisphereLight(0xffffff, 0x404040, 0.5);
     scene.add(light);
     light = new THREE.AmbientLight(0x404050);
@@ -82,49 +47,52 @@ define(function(require, exports) {
     scene.add(light);
 
     // buildObservatory
-    scene.add(models['base']);
-    top = models['top'];
+    scene.add(models.getModel('base'));
+    top = models.getModel('top');
     top.position.y = 5;
     scene.add(top);
-
-    telescope = models['telescope'];
+    telescope = models.getModel('telescope');
     top.add(telescope);
 
+    // build stations
+    // telescope
+    telescopeControls = controls.buildTelescopeControls(timeUniform);
+    scene.add(telescopeControls);
+    displays.push(telescopeControls.display);
 
-    var displayGeometry = new THREE.PlaneGeometry(1, 0.5);
-    var displayMaterial = new THREE.ShaderMaterial({
-      uniforms: displayUniforms,
-      vertexShader: getVertexShader('display'),
-      fragmentShader: getFragmentShader('display')
-    });
-    displayMaterial.side = THREE.DoubleSide;
-    displayMaterial.transparent = true;
-    var controlBoxNumber = Math.floor(Math.random() * 3) + 4;
-    for (var i = 0; i < controlBoxNumber; i++) {
-      var controlBox = models['controlBox'].clone();
-      controlBox.position.x = Math.random() * 8 - 4;
-      controlBox.position.z = Math.random() * 8 - 4;
-      scene.add(controlBox);
+    // planetTracker
+    planetTracker = controls.buildPlanetTracker(timeUniform);
+    scene.add(planetTracker);
+    displays.push(planetTracker.display);
 
-      var material = displayMaterial;
-      // set texture
-      var display = new THREE.Mesh(displayGeometry, material);
-      display.position.y = 1.2;
-      display.position.x = -0.2;
-      display.rotateOnAxis(display.up, Math.PI/2);
-      controlBox.add(display);
-    };
+    // mainScreen turn on
+    mainScreen = controls.buildMainScreen(timeUniform);
+    scene.add(mainScreen);
+    displays.push(mainScreen.display);
 
-    var powerBox = models['powerBox'];
-    powerBox.position.x = -7;
+    // laser sampler
+
+    // teleport controls
+
+
+
+    // misc stuff
+    // power station
+    var powerBox = models.getModel('powerBox');
+    powerBox.position.z = -7;
+    powerBox.rotateOnAxis(powerBox.up, -Math.PI/2);
     scene.add(powerBox);
 
-    meteor = models['meteor'];
+    // teleporter
+
+
+    // meteor
+    meteor = models.getModel('meteor');
     meteor.position.x = 180;
     meteor.position.y = 280;
     scene.add(meteor);
 
-    meteorEffect = models['meteorEffect'];
+    meteorEffect = models.getModel('meteorEffect');
     meteorEffect.material.transparent = true;
     meteorEffect.material.opacity = 0.5;
     meteor.add(meteorEffect);
@@ -142,21 +110,78 @@ define(function(require, exports) {
       mesh.lookAt(new THREE.Vector3());
       scene.add(mesh);
     }
+
+    // register colliders
+    scene.traverse(function(obj) {
+      if(obj !== scene) {
+        hitObjects.push(obj);
+      }
+    });
+
+    // add non collision objects
+    scene.add(pointer);
+    scene.add(helperPointer);
   }
 
 
   var left = new THREE.Vector3(0, 0, 1);
 
   update = function(delta) {
-    top.rotateOnAxis(top.up, -delta / 10);
-    telescope.rotateOnAxis(left, delta / 20);
-    camera.position.y -= delta;
-    camera.position.y = Math.max(camera.position.y, 1.0);
 
-    displayUniforms.time.value += delta;
+    timeUniform.value += delta;
+
+    displays.forEach(function(display) {
+      display.render();
+    });
+
+    var targetTopAngle = new THREE.Quaternion().setFromAxisAngle(top.up, telescopeControls.controls[0].value * Math.PI * 2);
+    top.quaternion.slerp(targetTopAngle, delta);
+
+    var targetTelescopeAngle = new THREE.Quaternion().setFromAxisAngle(left, -telescopeControls.controls[1].value * Math.PI * 0.9 + Math.PI/2 - 0.125);
+    telescope.quaternion.slerp(targetTelescopeAngle, delta);
+
+    var oldPointerPosition = pointer.position.clone();
+    var raycaster = new THREE.Raycaster(camera.position, new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion), 0.1);
+    var collisions = raycaster.intersectObjects(hitObjects, false);
+    var selectedControl = null;
+    var getControl = function(obj) {
+      while(obj !== null && obj !== undefined) {
+        if(obj.isControl) {
+          return obj;
+        }
+        obj = obj.parent;
+      }
+      return null;
+    }
+
+    if(collisions[0]) {
+      var collision = collisions[0];
+      pointer.position.copy(collision.point);
+      var control = getControl(collision.object);
+      if(control !== null) {
+        selectedControl = control;
+      }
+    }
+
+    if(controller.mouseDragOn && selectedControl !== null) {
+      var localPointer = selectedControl.thing.worldToLocal(pointer.position.clone());
+      var localOldPointer = selectedControl.thing.worldToLocal(oldPointerPosition.clone());
+      var controlPos = selectedControl.thing.position.clone();
+
+      var newPosAngle = Math.atan2(localPointer.z - controlPos.z, localPointer.x - controlPos.x);
+      var oldPosAngle = Math.atan2(localOldPointer.z - controlPos.z, localOldPointer.x - controlPos.x);
+      var rotationDelta = (oldPosAngle - newPosAngle);
+      rotationDelta = Math.atan2(Math.sin(rotationDelta), Math.cos(rotationDelta)) / 10.0;
+      selectedControl.turn(rotationDelta);
+    }
 
     var cameraOldPos = camera.position.clone();
     controller.update(delta);
+    camera.position.y -= delta;
+    camera.position.y = Math.max(camera.position.y, 1.0);
+
+    var movement = camera.position.clone().sub(cameraOldPos);
+    var raycaster
     // do collision raytrace
     // backup if needed
   }
@@ -164,7 +189,10 @@ define(function(require, exports) {
 
 
 
-
-  loadModels(start);
+  // start game
+  models.loadModels(function() {
+    init();
+    render();
+  });
 
 });

@@ -8,9 +8,11 @@
 <script type="x-shader/x-vertex" id="display-vertexShader">
   varying vec3 vNormal;
   varying vec3 vPosition;
+  varying vec2 vUv;
   uniform float time;
 
   void main() {
+    vUv = uv;
     vNormal = normal;
     vPosition = position;
     gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
@@ -18,15 +20,24 @@
 </script>
 <script type="x-shader/x-fragment" id="display-fragmentShader">
   varying vec3 vPosition;
+  varying vec2 vUv;
   uniform float time;
+  uniform sampler2D display;
+
+  float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,78.233))) * 43758.5453);
+  }
 
   void main() {
+    float scanline = sin(time * 50.0 + vPosition.y * -1000.0) / 16.0 + 0.5;
+    float lit = -vPosition.y / 1.0 + 0.5;
+    float alpha = texture2D(display, vUv).w;
 
-    gl_FragColor = vec4(1.0, 1.0, 1.0, sin(time * 50.0 + vPosition.y * -1000.0) / 16.0 + 0.5);
+    gl_FragColor = vec4(texture2D(display, vUv).xyz, scanline * lit * alpha + rand(vec2(vUv.x * time / 100.0, vUv.y * time / 100.0)) / 5.0 + 0.2);
   }
 </script>
+      <script src="simplex-noise.js"></script>
       <script src="three.js"></script>
-      <script src="threex.keyboardstate.js"></script>
       <script src="three.firstpersoncontrols.js"></script>
       <script src="three.colladaloader.js"></script>
       <script data-main="game.js" src="require.js"></script>
