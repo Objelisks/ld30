@@ -33,7 +33,7 @@ define(function(require, exports) {
   var timeUniform = { type: 'f', value: 0.5 };
   var top, telescope, meteor;
   var displays = [];
-  var telescopeControls, planetTracker, mainScreen, laserSampler, teleportControls;
+  var telescopeControls, planetTracker, mainScreen, laserSampler, teleporter, teleportControls, teleporterActiveRegion;
   var hitObjects = [];
 
   init = function() {
@@ -55,25 +55,31 @@ define(function(require, exports) {
     top.add(telescope);
 
     // build stations
-    // telescope
-    telescopeControls = controls.buildTelescopeControls(timeUniform);
-    scene.add(telescopeControls);
-    displays.push(telescopeControls.display);
+    // teleport controls
+    teleportControls = controls.buildTeleporterControls(timeUniform);
+    scene.add(teleportControls);
+    displays.push(teleportControls.display);
 
     // planetTracker
     planetTracker = controls.buildPlanetTracker(timeUniform);
+    planetTracker.display.teleportControls = teleportControls;
     scene.add(planetTracker);
     displays.push(planetTracker.display);
 
+    // telescope
+    telescopeControls = controls.buildTelescopeControls(timeUniform);
+    telescopeControls.display.teleportControls = teleportControls;
+    telescopeControls.display.planetTracker = planetTracker;
+    scene.add(telescopeControls);
+    displays.push(telescopeControls.display);
+
     // mainScreen turn on
     mainScreen = controls.buildMainScreen(timeUniform);
+    mainScreen.display.telescopeControls = telescopeControls;
     scene.add(mainScreen);
     displays.push(mainScreen.display);
 
     // laser sampler
-
-    // teleport controls
-
 
 
     // misc stuff
@@ -84,11 +90,13 @@ define(function(require, exports) {
     scene.add(powerBox);
 
     // teleporter
-
+    teleporter = controls.buildTeleporter(timeUniform);
+    scene.add(teleporter);
 
     // meteor
     meteor = models.getModel('meteor');
-    meteor.position.x = 180;
+    meteor.position.z = 200;
+    meteor.position.x = -180;
     meteor.position.y = 280;
     scene.add(meteor);
 
@@ -120,13 +128,54 @@ define(function(require, exports) {
 
     // add non collision objects
     scene.add(pointer);
-    scene.add(helperPointer);
+    var teleporterMaterial = new THREE.MeshBasicMaterial({ color: 0x004080 });
+    teleporterMaterial.transparent = true;
+    teleporterMaterial.opacity = 0.5;
+    teleporterMaterial.side = THREE.DoubleSide;
+    teleporterActiveRegion = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, 10), teleporterMaterial);
+    teleporterActiveRegion.visible = false;
+    teleporterActiveRegion.geometry.computeBoundingBox();
+    teleporter.add(teleporterActiveRegion);
+    //scene.add(helperPointer);
   }
 
 
   var left = new THREE.Vector3(0, 0, 1);
+  var teleportTimer = 3;
+  var raising = false;
 
   update = function(delta) {
+
+    var key1 = false, key2 = false, key3 = false;
+
+    if(teleportControls.redActive && teleportControls.controls[3].value === teleportControls.controls[0].value) {
+      key1 = true;
+    }
+
+    if(teleportControls.yellowActive && teleportControls.controls[4].value === teleportControls.controls[1].value) {
+      key2 = true;
+    }
+
+    if(teleportControls.blueActive && teleportControls.controls[5].value === teleportControls.controls[2].value) {
+      key3 = true;
+    }
+
+    teleporterActiveRegion.visible = key1 && key2 && key3;
+
+    var smallerBox = teleporterActiveRegion.geometry.boundingBox.clone().expandByScalar(-2);
+    var localCameraPosition = teleporterActiveRegion.worldToLocal(camera.position.clone());
+    if(teleporterActiveRegion.geometry.boundingBox.containsPoint(localCameraPosition) && key1 && key2 && key3) {
+      teleporter.ring1.rotateOnAxis(teleporter.up, delta * 5.2);
+      teleporter.ring2.rotateOnAxis(teleporter.up, delta * 10.5);
+      teleporter.ring3.rotateOnAxis(teleporter.up, delta * 3.8);
+      if(teleporterActiveRegion.position.clone().setY(1).distanceTo(localCameraPosition) < 0.5) {
+        raising = true;
+      }
+    }
+    if(raising) {
+      teleportTimer -= delta;
+      camera.position.y += delta * (3.1 - teleportTimer / 2.0);
+    }
 
     timeUniform.value += delta;
 
@@ -162,6 +211,7 @@ define(function(require, exports) {
         selectedControl = control;
       }
     }
+    collisions = null;
 
     if(controller.mouseDragOn && selectedControl !== null) {
       var localPointer = selectedControl.thing.worldToLocal(pointer.position.clone());
@@ -175,15 +225,20 @@ define(function(require, exports) {
       selectedControl.turn(rotationDelta);
     }
 
+    // movement
     var cameraOldPos = camera.position.clone();
     controller.update(delta);
     camera.position.y -= delta;
     camera.position.y = Math.max(camera.position.y, 1.0);
 
+    // movement collision (good enough)
     var movement = camera.position.clone().sub(cameraOldPos);
-    var raycaster
-    // do collision raytrace
-    // backup if needed
+    var movementRaycaster = new THREE.Raycaster(cameraOldPos.clone().sub(new THREE.Vector3(0, 0.8, 0)), movement.clone(), 0, 0.5);
+    collisions = movementRaycaster.intersectObjects(hitObjects, false);
+    if(collisions[0]) {
+      // ideally, subtract collision normal or something so player slides
+      camera.position.copy(cameraOldPos);
+    }
   }
 
 

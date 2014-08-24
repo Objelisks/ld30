@@ -8,7 +8,6 @@ define(function(require, exports) {
   var loadModel = function(name, callback) {
     //var modelFile = require('./models/' + name + '.dae');
     colladaLoader.load('./models/' + name + '.dae', function(collada) {
-      console.log('loaded mesh:', name);
       callback(collada.scene);
     });
   }
@@ -16,7 +15,7 @@ define(function(require, exports) {
   var models = {};
   var loadModels = function(callback) {
     // hacky straight up defining all the model names
-    var modelNames = ['base', 'top', 'telescope', 'controlBox', 'meteor', 'meteorEffect', 'powerBox', 'knob', 'mainScreen'];
+    var modelNames = ['base', 'top', 'telescope', 'controlBox', 'meteor', 'meteorEffect', 'powerBox', 'knob', 'mainScreen', 'teleporter', 'teleporterRing'];
     var totalRequired = modelNames.length;
     var totalLoaded = 0;
     modelNames.forEach(function(name) {
@@ -25,7 +24,6 @@ define(function(require, exports) {
         models[name] = modelScene.children[0].children[0];
         totalLoaded += 1;
         if(totalLoaded >= totalRequired) {
-          console.log('all loaded');
           callback();
         }
       });
